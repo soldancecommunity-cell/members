@@ -421,20 +421,20 @@
     // API
     // =============================================
     async function fetchGAS(action, params = {}) {
-      const body = {
+      const payload = {
         action,
-        accessToken: params.accessToken || liff.getAccessToken(),
+        accessToken: liff.getAccessToken(),
         ...params
       };
-      delete body.accessToken;
-      body.accessToken = liff.getAccessToken();
-
+    
+      const form = new URLSearchParams();
+      form.set('payload', JSON.stringify(payload));
+    
       const res = await fetch(CONFIG.GAS_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, accessToken: liff.getAccessToken(), ...params })
+        body: form
       });
-
+    
       if (!res.ok) throw new Error('サーバーとの通信に失敗しました');
       return await res.json();
     }
