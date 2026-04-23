@@ -17,6 +17,7 @@
       --sol-gray-bg: #f2f0eb;
       --sol-red: #c75050;
       --sol-green: #4a8c6f;
+      --sol-blue: #4a6b8c;
       --radius: 12px;
       --shadow: 0 2px 12px rgba(0,0,0,0.06);
     }
@@ -31,7 +32,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* --- Header --- */
     .header {
       background: var(--sol-black);
       color: var(--sol-white);
@@ -59,7 +59,6 @@
       letter-spacing: 1px;
     }
 
-    /* --- Loading / States --- */
     .state-container {
       display: flex;
       flex-direction: column;
@@ -69,7 +68,6 @@
       padding: 40px 24px;
       text-align: center;
     }
-
     .spinner {
       width: 36px; height: 36px;
       border: 3px solid var(--sol-gray-light);
@@ -79,13 +77,11 @@
       margin-bottom: 20px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .state-msg {
       font-size: 14px;
       color: var(--sol-gray);
-      line-height: 1.6;
+      line-height: 1.7;
     }
-
     .error-icon {
       width: 48px; height: 48px;
       border-radius: 50%;
@@ -94,7 +90,6 @@
       margin-bottom: 16px;
       font-size: 24px;
     }
-
     .retry-btn {
       margin-top: 20px;
       padding: 10px 28px;
@@ -107,17 +102,51 @@
       cursor: pointer;
     }
 
-    /* --- Member Card --- */
-    .member-section {
-      padding: 24px 20px 100px;
-      max-width: 480px;
+    .page {
+      max-width: 520px;
       margin: 0 auto;
-      animation: fadeUp 0.4s ease-out;
+      padding: 20px 16px 100px;
+      animation: fadeUp 0.35s ease-out;
     }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    .stack { display: grid; gap: 14px; }
+
+    .panel {
+      background: var(--sol-white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid var(--sol-gray-light);
+    }
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .panel-subtitle {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--sol-gray);
+      line-height: 1.6;
+    }
+    .panel-body {
+      padding: 16px 18px 18px;
+    }
+
+    .notice {
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .notice.info { background: #f7f4ed; color: var(--sol-black); }
+    .notice.warn { background: #fff4e9; color: #7d4f00; }
 
     .member-card {
       background: var(--sol-white);
@@ -125,51 +154,51 @@
       box-shadow: var(--shadow);
       overflow: hidden;
     }
-
     .card-header {
       background: var(--sol-black);
       color: var(--sol-white);
-      padding: 20px 24px;
+      padding: 18px 20px;
       display: flex;
       align-items: center;
       gap: 14px;
     }
     .card-avatar {
-      width: 44px; height: 44px;
+      width: 46px; height: 46px;
       border-radius: 50%;
       background: var(--sol-gold);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 700;
       color: var(--sol-black);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
       flex-shrink: 0;
     }
-    .card-name {
-      font-size: 17px;
-      font-weight: 500;
+    .card-name { font-size: 17px; font-weight: 700; }
+    .card-id { font-size: 11px; color: var(--sol-gold-light); margin-top: 3px; }
+    .card-badges { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .4px;
     }
-    .card-id {
-      font-size: 11px;
-      color: var(--sol-gold-light);
-      letter-spacing: 1px;
-      margin-top: 2px;
-    }
+    .badge.gold { background: rgba(200,164,90,0.18); color: var(--sol-gold-light); }
+    .badge.blue { background: rgba(74,107,140,0.2); color: #d4e2f2; }
 
-    /* --- Fields --- */
-    .fields {
-      padding: 8px 0;
-    }
-
+    .fields { padding: 8px 0; }
     .field-row {
-      padding: 16px 24px;
+      padding: 16px 20px;
       border-bottom: 1px solid var(--sol-gray-light);
       display: flex;
       align-items: center;
       gap: 12px;
-      transition: background 0.2s;
+      transition: background .2s;
     }
     .field-row:last-child { border-bottom: none; }
     .field-row.editing { background: #fdf9ef; }
-
     .field-icon {
       width: 36px; height: 36px;
       border-radius: 8px;
@@ -179,60 +208,48 @@
       font-size: 16px;
     }
     .field-row.editing .field-icon { background: #f5eedb; }
-
     .field-body { flex: 1; min-width: 0; }
-    .field-label {
-      font-size: 11px;
-      color: var(--sol-gray);
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-    .field-value {
-      font-size: 15px;
-      font-weight: 500;
-      word-break: break-all;
-    }
-    .field-value.empty {
-      color: var(--sol-gray-light);
-      font-style: italic;
-      font-weight: 400;
-    }
-
-    .field-input {
+    .field-label { font-size: 11px; color: var(--sol-gray); margin-bottom: 4px; }
+    .field-value { font-size: 15px; font-weight: 500; word-break: break-all; }
+    .field-value.empty { color: #a9a39a; font-style: italic; font-weight: 400; }
+    .field-input,
+    .search-input {
       width: 100%;
       font-family: inherit;
       font-size: 15px;
       font-weight: 500;
       color: var(--sol-black);
       border: 1.5px solid var(--sol-gold);
-      border-radius: 6px;
-      padding: 8px 10px;
+      border-radius: 8px;
+      padding: 10px 12px;
       background: var(--sol-white);
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color .2s;
     }
-    .field-input:focus {
+    .field-input:focus,
+    .search-input:focus {
       border-color: var(--sol-black);
-      box-shadow: 0 0 0 3px rgba(200, 164, 90, 0.15);
+      box-shadow: 0 0 0 3px rgba(200,164,90,0.15);
     }
-    .field-input.error {
-      border-color: var(--sol-red);
-    }
-    .field-error {
+    .field-input.error,
+    .search-input.error { border-color: var(--sol-red); }
+    .field-error,
+    .search-error {
+      margin-top: 6px;
       font-size: 11px;
       color: var(--sol-red);
-      margin-top: 4px;
+      line-height: 1.5;
     }
 
-    /* --- Buttons --- */
     .action-bar {
-      padding: 16px 24px 20px;
+      padding: 16px 20px 20px;
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
-
     .btn {
       flex: 1;
+      min-width: 130px;
       padding: 14px;
       border: none;
       border-radius: 10px;
@@ -240,56 +257,92 @@
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s;
-      letter-spacing: 0.5px;
+      transition: all .2s;
+      letter-spacing: .4px;
     }
-    .btn:active { transform: scale(0.97); }
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-primary { background: var(--sol-black); color: var(--sol-white); }
+    .btn-secondary { background: var(--sol-gray-light); color: var(--sol-black); }
+    .btn-save { background: var(--sol-gold); color: var(--sol-black); }
+    .btn-outline { background: transparent; color: var(--sol-black); border: 1.5px solid var(--sol-gray-light); }
 
-    .btn-primary {
-      background: var(--sol-black);
-      color: var(--sol-white);
+    .member-switcher { display: grid; gap: 10px; }
+    .member-switch-btn,
+    .result-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--sol-gray-light);
+      background: var(--sol-white);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
     }
-    .btn-primary:hover:not(:disabled) { background: #333; }
+    .member-switch-btn.active,
+    .member-switch-btn:hover,
+    .result-item:hover {
+      border-color: var(--sol-gold);
+      background: #fdf9ef;
+    }
+    .member-switch-name,
+    .result-name { font-size: 14px; font-weight: 700; }
+    .member-switch-meta,
+    .result-meta { margin-top: 4px; font-size: 11px; color: var(--sol-gray); line-height: 1.6; }
 
-    .btn-secondary {
-      background: var(--sol-gray-light);
+    .search-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .search-label {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
       color: var(--sol-black);
     }
-    .btn-secondary:hover:not(:disabled) { background: #d4d1cc; }
-
-    .btn-save {
-      background: var(--sol-gold);
-      color: var(--sol-black);
-    }
-    .btn-save:hover:not(:disabled) { background: #b89545; }
-
-    .btn-cancel {
-      background: transparent;
+    .hint {
+      font-size: 11px;
       color: var(--sol-gray);
-      border: 1.5px solid var(--sol-gray-light);
+      line-height: 1.6;
+      margin-top: 4px;
     }
+    .result-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .result-actions { margin-top: 10px; display: flex; gap: 8px; }
 
-    /* --- Toast --- */
+    .info-note {
+      padding: 14px 16px;
+      background: var(--sol-white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      color: var(--sol-gray);
+      line-height: 1.7;
+    }
+    .info-note strong { color: var(--sol-black); }
+
     .toast {
       position: fixed;
       bottom: 24px;
-      left: 50%; transform: translateX(-50%) translateY(80px);
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
       background: var(--sol-black);
       color: var(--sol-white);
-      padding: 12px 24px;
+      padding: 12px 20px;
       border-radius: 10px;
       font-size: 13px;
       font-weight: 500;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
       z-index: 100;
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: all .3s ease;
       white-space: nowrap;
+      max-width: calc(100vw - 32px);
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .toast.show {
       opacity: 1;
@@ -298,85 +351,102 @@
     .toast.success { background: var(--sol-green); }
     .toast.error { background: var(--sol-red); }
 
-    /* --- Note --- */
-    .info-note {
-      margin-top: 16px;
-      padding: 14px 18px;
-      background: var(--sol-white);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      font-size: 12px;
-      color: var(--sol-gray);
-      line-height: 1.7;
-    }
-    .info-note strong {
-      color: var(--sol-black);
-      font-weight: 500;
-    }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
-
   <div class="header">
     <div class="header-logo">SoL Dance Community</div>
     <div class="header-title">会員情報</div>
   </div>
 
-  <!-- Loading -->
   <div id="loading" class="state-container">
     <div class="spinner"></div>
     <div class="state-msg">会員情報を読み込んでいます...</div>
   </div>
 
-  <!-- Error -->
-  <div id="error" class="state-container" style="display:none;">
+  <div id="error" class="state-container" hidden>
     <div class="error-icon">⚠</div>
     <div class="state-msg" id="error-msg">エラーが発生しました</div>
     <button class="retry-btn" onclick="init()">再読み込み</button>
   </div>
 
-  <!-- Member Info -->
-  <div id="member" class="member-section" style="display:none;">
-    <div class="member-card">
-      <div class="card-header">
-        <div class="card-avatar" id="avatar"></div>
-        <div>
-          <div class="card-name" id="display-name"></div>
-          <div class="card-id" id="display-id"></div>
+  <main id="app" class="page" hidden>
+    <div class="stack">
+      <div id="top-notice" class="notice info" hidden></div>
+
+      <section id="linked-panel" class="panel" hidden>
+        <div class="panel-header">
+          <div class="panel-title">LINEに紐づく会員</div>
+          <div class="panel-subtitle">同じLINEに複数会員が紐づいている場合は、ここから切り替えて確認できます。</div>
         </div>
+        <div class="panel-body">
+          <div id="linked-list" class="member-switcher"></div>
+        </div>
+      </section>
+
+      <section id="member-card" class="member-card" hidden>
+        <div class="card-header">
+          <div class="card-avatar" id="avatar"></div>
+          <div>
+            <div class="card-name" id="display-name"></div>
+            <div class="card-id" id="display-id"></div>
+            <div class="card-badges" id="card-badges"></div>
+          </div>
+        </div>
+        <div class="fields" id="fields"></div>
+        <div id="member-mode-note" class="notice warn" hidden></div>
+        <div class="action-bar" id="action-bar"></div>
+      </section>
+
+      <section id="search-panel" class="panel" hidden>
+        <div class="panel-header">
+          <div class="panel-title">別の会員を確認する</div>
+          <div class="panel-subtitle">未連携の会員や兄弟会員も、会員情報で検索して表示できます。</div>
+        </div>
+        <div class="panel-body">
+          <div class="search-grid">
+            <div>
+              <div class="search-label">名前 <span style="color:#c75050;">*</span></div>
+              <input id="search-name" class="search-input" type="text" placeholder="山田 太郎" autocomplete="off">
+            </div>
+            <div>
+              <div class="search-label">生年月日 <span style="color:#c75050;">*</span></div>
+              <input id="search-birth-date" class="search-input" type="date" autocomplete="bday">
+            </div>
+            <div>
+              <div class="search-label">緊急連絡先</div>
+              <input id="search-emergency" class="search-input" type="tel" placeholder="09012345678" autocomplete="tel">
+            </div>
+            <div>
+              <div class="search-label">メールアドレス</div>
+              <input id="search-email" class="search-input" type="email" placeholder="example@mail.com" autocomplete="email">
+            </div>
+          </div>
+          <div class="hint">緊急連絡先かメールアドレスのどちらか1つ以上を入力してください。両方入れると照合精度が上がります。</div>
+          <div id="search-error" class="search-error" hidden></div>
+          <div class="action-bar" style="padding:16px 0 0;">
+            <button id="search-btn" class="btn btn-primary" onclick="searchMembers()">検索する</button>
+            <button class="btn btn-outline" onclick="toggleSearchPanel(false)">閉じる</button>
+          </div>
+          <div id="search-results" class="result-list" hidden></div>
+        </div>
+      </section>
+
+      <div class="info-note">
+        <strong>ご注意：</strong>LINEに直接紐づく会員は自動で表示されます。別会員検索では、名前・生年月日・緊急連絡先またはメールアドレスの一致が必要です。
       </div>
-
-      <div class="fields" id="fields"></div>
-
-      <div class="action-bar" id="action-bar"></div>
     </div>
+  </main>
 
-    <div class="info-note">
-      <strong>ご案内：</strong>登録内容は最新の状態に保ってください。変更内容は保存後に会員情報へ反映されます。
-    </div>
-  </div>
+  <div id="toast" class="toast"></div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
-
-  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
   <script>
-    // =============================================
-    // 設定 - デプロイ時に書き換え
-    // =============================================
     const CONFIG = {
-      LIFF_ID: '2008938862-r3bcosH7',          // ← LIFFアプリIDを設定
-      GAS_URL: 'https://script.google.com/macros/s/AKfycbwNvLzkM8BE4yzwHavlcUf2utQGQmGXGPrt0kDl9RS_ije1GtzEutnz1LeXtIprdcm3DQ/exec'   // ← GASウェブアプリURLを設定
+      LIFF_ID: '2008938862-r3bcosH7',
+      GAS_URL: 'https://script.google.com/macros/s/AKfycbwNvLzkM8BE4yzwHavlcUf2utQGQmGXGPrt0kDl9RS_ije1GtzEutnz1LeXtIprdcm3DQ/exec'
     };
-
-    // =============================================
-    // State
-    // =============================================
-    let currentMember = null;
-    let isEditing = false;
-    let isSaving = false;
 
     const FIELDS = [
       { key: 'name', label: '名前', icon: '👤', type: 'text', placeholder: '山田 太郎' },
@@ -384,14 +454,19 @@
       { key: 'email', label: 'メールアドレス', icon: '✉️', type: 'email', placeholder: 'example@mail.com' }
     ];
 
-    // =============================================
-    // Init
-    // =============================================
+    let linkedMembers = [];
+    let currentMember = null;
+    let currentSource = 'linked';
+    let isEditing = false;
+    let isSaving = false;
+    let searchOpen = false;
+    let searchResults = [];
+
     async function init() {
       showState('loading');
+      clearSearchErrors();
 
       try {
-        // LIFF 初期化
         await liff.init({ liffId: CONFIG.LIFF_ID });
 
         if (!liff.isLoggedIn()) {
@@ -399,146 +474,254 @@
           return;
         }
 
-        // アクセストークン取得
-        const accessToken = liff.getAccessToken();
-        if (!accessToken) throw new Error('LINEの認証情報を取得できませんでした');
-
-        // GAS から会員情報取得
-        const res = await fetchGAS('get', { accessToken });
-
+        const res = await fetchGAS('get');
         if (!res.success) throw new Error(res.error || '会員情報の取得に失敗しました');
 
-        currentMember = res.member;
-        renderMember();
-        showState('member');
+        linkedMembers = Array.isArray(res.linkedMembers) ? res.linkedMembers : [];
+        currentMember = linkedMembers[0] || null;
+        currentSource = 'linked';
+        isEditing = false;
+        searchResults = [];
+        searchOpen = linkedMembers.length === 0;
 
+        render(res.message || '');
+        showState('app');
       } catch (err) {
-        showError(err.message);
+        showError(err.message || '読み込みに失敗しました');
       }
     }
 
-    // =============================================
-    // API
-    // =============================================
     async function fetchGAS(action, params = {}) {
       const payload = {
         action,
         accessToken: liff.getAccessToken(),
         ...params
       };
-    
+
       const form = new URLSearchParams();
       form.set('payload', JSON.stringify(payload));
-    
+
       const res = await fetch(CONFIG.GAS_URL, {
         method: 'POST',
         body: form
       });
-    
+
       if (!res.ok) throw new Error('サーバーとの通信に失敗しました');
       return await res.json();
     }
 
-    // =============================================
-    // Render
-    // =============================================
-    function renderMember() {
-      // Avatar & header
+    function render(topMessage = '') {
+      renderTopNotice(topMessage);
+      renderLinkedMembers();
+      renderMemberCard();
+      renderSearchPanel();
+    }
+
+    function renderTopNotice(message) {
+      const el = document.getElementById('top-notice');
+      if (!message) {
+        el.hidden = true;
+        el.textContent = '';
+        return;
+      }
+      el.hidden = false;
+      el.textContent = message;
+    }
+
+    function renderLinkedMembers() {
+      const panel = document.getElementById('linked-panel');
+      const list = document.getElementById('linked-list');
+
+      if (!linkedMembers.length) {
+        panel.hidden = true;
+        list.innerHTML = '';
+        return;
+      }
+
+      panel.hidden = false;
+      list.innerHTML = linkedMembers.map(member => {
+        const active = currentMember && currentMember.member_id === member.member_id ? 'active' : '';
+        return `
+          <button class="member-switch-btn ${active}" onclick="selectLinkedMember('${escapeAttr(member.member_id)}')">
+            <div class="member-switch-name">${escapeHtml(member.name || '未設定')}</div>
+            <div class="member-switch-meta">会員ID: ${escapeHtml(member.member_id || '---')} / 緊急連絡先: ${escapeHtml(maskPhone(member.emergency_contact))}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderMemberCard() {
+      const card = document.getElementById('member-card');
+      const fieldsEl = document.getElementById('fields');
+      const actionBar = document.getElementById('action-bar');
+
+      if (!currentMember) {
+        card.hidden = true;
+        fieldsEl.innerHTML = '';
+        actionBar.innerHTML = '';
+        return;
+      }
+
+      card.hidden = false;
+
       const name = currentMember.name || '---';
-      document.getElementById('avatar').textContent = name.charAt(0);
+      document.getElementById('avatar').textContent = name.charAt(0) || '会';
       document.getElementById('display-name').textContent = name;
       document.getElementById('display-id').textContent = 'ID: ' + (currentMember.member_id || '---');
 
-      // Fields
-      const fieldsEl = document.getElementById('fields');
-      fieldsEl.innerHTML = '';
+      const badges = [];
+      if (currentSource === 'linked') badges.push('<span class="badge gold">LINE連携済み</span>');
+      if (currentSource === 'search') badges.push('<span class="badge blue">検索表示中</span>');
+      document.getElementById('card-badges').innerHTML = badges.join('');
 
-      FIELDS.forEach(f => {
-        const value = currentMember[f.key] || '';
-        const row = document.createElement('div');
-        row.className = 'field-row' + (isEditing ? ' editing' : '');
-        row.id = 'row-' + f.key;
+      const modeNoteEl = document.getElementById('member-mode-note');
+      const isViewOnlySearch = currentSource === 'search';
+      if (isViewOnlySearch) {
+        modeNoteEl.hidden = false;
+        modeNoteEl.innerHTML = '<strong>ご案内：</strong>この会員情報は検索による閲覧表示です。電話番号・メールアドレスなどを変更したい場合は、SoL公式LINEに「会員情報を変更したい」旨と、正しい電話番号・メールアドレス・名前を送信してください。';
+      } else {
+        modeNoteEl.hidden = true;
+        modeNoteEl.innerHTML = '';
+      }
 
-        row.innerHTML = `
-          <div class="field-icon">${f.icon}</div>
-          <div class="field-body">
-            <div class="field-label">${f.label}</div>
-            ${isEditing
-              ? `<input class="field-input" id="input-${f.key}" type="${f.type}"
-                   value="${escapeHtml(value)}" placeholder="${f.placeholder}"
-                   autocomplete="off">`
-              : `<div class="field-value ${!value ? 'empty' : ''}">${value || '未設定'}</div>`
-            }
+      fieldsEl.innerHTML = FIELDS.map(field => {
+        const value = currentMember[field.key] || '';
+        return `
+          <div class="field-row ${isEditing ? 'editing' : ''}" id="row-${field.key}">
+            <div class="field-icon">${field.icon}</div>
+            <div class="field-body">
+              <div class="field-label">${field.label}</div>
+              ${isEditing
+                ? `<input class="field-input" id="input-${field.key}" type="${field.type}" value="${escapeAttr(value)}" placeholder="${field.placeholder}" autocomplete="off">`
+                : `<div class="field-value ${!value ? 'empty' : ''}">${escapeHtml(value || '未設定')}</div>`}
+            </div>
           </div>
         `;
-        fieldsEl.appendChild(row);
-      });
+      }).join('');
 
-      // Buttons
-      const actionBar = document.getElementById('action-bar');
       if (isEditing) {
         actionBar.innerHTML = `
-          <button class="btn btn-cancel" onclick="cancelEdit()">キャンセル</button>
+          <button class="btn btn-outline" onclick="cancelEdit()">キャンセル</button>
           <button class="btn btn-save" id="save-btn" onclick="saveChanges()">保存する</button>
+        `;
+      } else if (currentSource === 'linked') {
+        actionBar.innerHTML = `
+          <button class="btn btn-primary" onclick="startEdit()">編集する</button>
+          <button class="btn btn-secondary" onclick="toggleSearchPanel(true)">別の会員を確認</button>
         `;
       } else {
         actionBar.innerHTML = `
-          <button class="btn btn-primary" onclick="startEdit()">編集する</button>
+          <button class="btn btn-secondary" onclick="toggleSearchPanel(true)">別の会員を確認</button>
+          ${linkedMembers.length ? '<button class="btn btn-outline" onclick="selectLinkedMember(\'' + escapeAttr(linkedMembers[0].member_id) + '\')">LINE連携会員に戻る</button>' : ''}
         `;
       }
     }
 
-    // =============================================
-    // Edit
-    // =============================================
+    function renderSearchPanel() {
+      const panel = document.getElementById('search-panel');
+      const resultsEl = document.getElementById('search-results');
+      panel.hidden = !searchOpen;
+
+      if (!searchOpen) {
+        resultsEl.hidden = true;
+        return;
+      }
+
+      if (!searchResults.length) {
+        resultsEl.hidden = true;
+        resultsEl.innerHTML = '';
+        return;
+      }
+
+      resultsEl.hidden = false;
+      resultsEl.innerHTML = searchResults.map(member => `
+        <div class="result-item">
+          <div class="result-name">${escapeHtml(member.name || '未設定')}</div>
+          <div class="result-meta">会員ID: ${escapeHtml(member.member_id || '---')} / 緊急連絡先: ${escapeHtml(maskPhone(member.emergency_contact))} / メール: ${escapeHtml(maskEmail(member.email))}</div>
+          <div class="result-actions">
+            <button class="btn btn-primary" onclick="selectSearchResult('${escapeAttr(member.member_id)}')">この会員を開く</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function selectLinkedMember(memberId) {
+      const found = linkedMembers.find(member => member.member_id === memberId);
+      if (!found) return;
+      currentMember = { ...found };
+      currentSource = 'linked';
+      isEditing = false;
+      render();
+    }
+
+    function selectSearchResult(memberId) {
+      const found = searchResults.find(member => member.member_id === memberId);
+      if (!found) return;
+      currentMember = { ...found };
+      currentSource = linkedMembers.some(member => member.member_id === memberId) ? 'linked' : 'search';
+      isEditing = false;
+      render();
+      showToast(currentSource === 'linked' ? '会員情報を表示しました' : '会員情報を閲覧表示しました', 'success');
+    }
+
+    function toggleSearchPanel(forceOpen) {
+      searchOpen = typeof forceOpen === 'boolean' ? forceOpen : !searchOpen;
+      if (!searchOpen) {
+        clearSearchErrors();
+        searchResults = [];
+      }
+      render();
+    }
+
     function startEdit() {
+      if (!currentMember) return;
+      if (currentSource !== 'linked') {
+        showToast('検索で表示した会員情報は閲覧のみです', 'info');
+        return;
+      }
       isEditing = true;
-      renderMember();
-      // 最初のフィールドにフォーカス
+      render();
       const firstInput = document.getElementById('input-name');
-      if (firstInput) setTimeout(() => firstInput.focus(), 100);
+      if (firstInput) setTimeout(() => firstInput.focus(), 80);
     }
 
     function cancelEdit() {
       isEditing = false;
-      // エラー表示をクリア
-      document.querySelectorAll('.field-error').forEach(el => el.remove());
-      renderMember();
+      clearFieldErrors();
+      render();
     }
 
     async function saveChanges() {
-      if (isSaving) return;
+      if (!currentMember || isSaving) return;
 
-      // 入力値取得
       const updates = {};
       let hasChanges = false;
 
-      FIELDS.forEach(f => {
-        const input = document.getElementById('input-' + f.key);
+      FIELDS.forEach(field => {
+        const input = document.getElementById('input-' + field.key);
         if (!input) return;
         const newVal = input.value.trim();
-        const oldVal = (currentMember[f.key] || '').trim();
+        const oldVal = String(currentMember[field.key] || '').trim();
         if (newVal !== oldVal) {
-          updates[f.key] = newVal;
+          updates[field.key] = newVal;
           hasChanges = true;
         }
       });
 
       if (!hasChanges) {
+        isEditing = false;
+        render();
         showToast('変更はありません', 'info');
-        cancelEdit();
         return;
       }
 
-      // フロントエンドバリデーション
-      clearErrors();
-      const errors = validateFrontend(updates);
-      if (errors.length > 0) {
-        errors.forEach(e => showFieldError(e.field, e.message));
+      clearFieldErrors();
+      const errors = validateMemberUpdates(updates);
+      if (errors.length) {
+        errors.forEach(err => showFieldError(err.field, err.message));
         return;
       }
 
-      // 保存
       isSaving = true;
       const saveBtn = document.getElementById('save-btn');
       if (saveBtn) {
@@ -547,49 +730,107 @@
       }
 
       try {
-        const res = await fetchGAS('update', { updates });
+        const res = await fetchGAS('update', {
+          member_id: currentMember.member_id,
+          updates
+        });
 
-        if (!res.success) {
-          showToast(res.error || '保存に失敗しました', 'error');
-          return;
-        }
+        if (!res.success) throw new Error(res.error || '保存に失敗しました');
 
         currentMember = res.member;
+        linkedMembers = linkedMembers.map(member => member.member_id === res.member.member_id ? res.member : member);
+        searchResults = searchResults.map(member => member.member_id === res.member.member_id ? res.member : member);
+        currentSource = linkedMembers.some(member => member.member_id === res.member.member_id) ? 'linked' : currentSource;
         isEditing = false;
-        renderMember();
+        render();
         showToast('会員情報を更新しました', 'success');
-
       } catch (err) {
-        showToast('通信エラーが発生しました', 'error');
+        showToast(err.message || '保存に失敗しました', 'error');
       } finally {
         isSaving = false;
       }
     }
 
-    // =============================================
-    // Validation
-    // =============================================
-    function validateFrontend(updates) {
-      const errors = [];
+    async function searchMembers() {
+      clearSearchErrors();
+      const criteria = {
+        name: document.getElementById('search-name').value.trim(),
+        birth_date: document.getElementById('search-birth-date').value,
+        emergency_contact: document.getElementById('search-emergency').value.trim(),
+        email: document.getElementById('search-email').value.trim()
+      };
 
-      if (updates.name !== undefined) {
-        if (updates.name.length === 0) errors.push({ field: 'name', message: '名前を入力してください' });
-        if (updates.name.length > 50) errors.push({ field: 'name', message: '50文字以内で入力してください' });
+      const errors = validateSearchCriteria(criteria);
+      if (errors.length) {
+        showSearchError(errors.join('\n'));
+        return;
       }
 
+      const btn = document.getElementById('search-btn');
+      btn.disabled = true;
+      btn.textContent = '検索中...';
+
+      try {
+        const res = await fetchGAS('search', { criteria });
+        if (!res.success) throw new Error(res.error || '検索に失敗しました');
+
+        searchResults = Array.isArray(res.members) ? res.members : [];
+        renderSearchPanel();
+
+        if (!searchResults.length) {
+          showSearchError(res.message || '一致する会員が見つかりませんでした。');
+          return;
+        }
+
+        if (searchResults.length === 1) {
+          selectSearchResult(searchResults[0].member_id);
+        } else {
+          showToast('候補が複数見つかりました。会員を選択してください。', 'info');
+        }
+      } catch (err) {
+        showSearchError(err.message || '検索に失敗しました');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '検索する';
+      }
+    }
+
+    function validateMemberUpdates(updates) {
+      const errors = [];
+      if (updates.name !== undefined) {
+        if (!updates.name) errors.push({ field: 'name', message: '名前を入力してください' });
+        if (updates.name.length > 50) errors.push({ field: 'name', message: '50文字以内で入力してください' });
+      }
       if (updates.emergency_contact !== undefined) {
-        const emergencyContact = updates.emergency_contact.replace(/[-\s]/g, '');
-        if (!/^0\d{9,10}$/.test(emergencyContact)) {
+        const phone = updates.emergency_contact.replace(/[^0-9]/g, '');
+        if (!/^0\d{9,10}$/.test(phone)) {
           errors.push({ field: 'emergency_contact', message: '正しい緊急連絡先を入力してください（例: 09012345678）' });
         }
       }
-
       if (updates.email !== undefined && updates.email.length > 0) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updates.email)) {
           errors.push({ field: 'email', message: '正しいメールアドレスを入力してください' });
         }
       }
+      return errors;
+    }
 
+    function validateSearchCriteria(criteria) {
+      const errors = [];
+      if (!criteria.name) errors.push('名前を入力してください。');
+      if (!criteria.birth_date) errors.push('生年月日を入力してください。');
+      if (!criteria.emergency_contact && !criteria.email) {
+        errors.push('緊急連絡先またはメールアドレスを入力してください。');
+      }
+      if (criteria.emergency_contact) {
+        const phone = criteria.emergency_contact.replace(/[^0-9]/g, '');
+        if (!/^0\d{9,10}$/.test(phone)) {
+          errors.push('緊急連絡先は 09012345678 形式で入力してください。');
+        }
+      }
+      if (criteria.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(criteria.email)) {
+        errors.push('メールアドレスの形式が正しくありません。');
+      }
       return errors;
     }
 
@@ -597,49 +838,75 @@
       const input = document.getElementById('input-' + fieldKey);
       if (!input) return;
       input.classList.add('error');
-      const errEl = document.createElement('div');
-      errEl.className = 'field-error';
-      errEl.textContent = message;
-      input.parentNode.appendChild(errEl);
+      const err = document.createElement('div');
+      err.className = 'field-error';
+      err.textContent = message;
+      input.parentNode.appendChild(err);
     }
 
-    function clearErrors() {
+    function clearFieldErrors() {
       document.querySelectorAll('.field-input.error').forEach(el => el.classList.remove('error'));
       document.querySelectorAll('.field-error').forEach(el => el.remove());
     }
 
-    // =============================================
-    // UI Helpers
-    // =============================================
-    function showState(state) {
-      document.getElementById('loading').style.display = state === 'loading' ? '' : 'none';
-      document.getElementById('error').style.display = state === 'error' ? '' : 'none';
-      document.getElementById('member').style.display = state === 'member' ? '' : 'none';
+    function showSearchError(message) {
+      const el = document.getElementById('search-error');
+      el.hidden = false;
+      el.textContent = message;
     }
 
-    function showError(msg) {
-      document.getElementById('error-msg').textContent = msg;
+    function clearSearchErrors() {
+      const el = document.getElementById('search-error');
+      el.hidden = true;
+      el.textContent = '';
+      document.querySelectorAll('.search-input.error').forEach(node => node.classList.remove('error'));
+    }
+
+    function showState(state) {
+      document.getElementById('loading').hidden = state !== 'loading';
+      document.getElementById('error').hidden = state !== 'error';
+      document.getElementById('app').hidden = state !== 'app';
+    }
+
+    function showError(message) {
+      document.getElementById('error-msg').textContent = message;
       showState('error');
     }
 
     let toastTimer;
-    function showToast(msg, type = 'info') {
+    function showToast(message, type = 'info') {
       const el = document.getElementById('toast');
-      el.textContent = msg;
+      el.textContent = message;
       el.className = 'toast ' + type + ' show';
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { el.classList.remove('show'); }, 2500);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function maskPhone(value) {
+      const digits = String(value || '').replace(/[^0-9]/g, '');
+      if (digits.length < 4) return value || '未設定';
+      if (digits.length <= 7) return digits.slice(0, 2) + '****' + digits.slice(-1);
+      return digits.slice(0, 3) + '****' + digits.slice(-4);
+    }
+
+    function maskEmail(value) {
+      const email = String(value || '');
+      if (!email || !email.includes('@')) return value || '未設定';
+      const [local, domain] = email.split('@');
+      const head = local.slice(0, 2);
+      return head + '***@' + domain;
     }
 
     function escapeHtml(str) {
       const div = document.createElement('div');
-      div.textContent = str;
+      div.textContent = String(str == null ? '' : str);
       return div.innerHTML;
     }
 
-    // =============================================
-    // Start
-    // =============================================
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/"/g, '&quot;');
+    }
+
     document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
