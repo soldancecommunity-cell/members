@@ -407,8 +407,14 @@
         <div class="panel-body">
           <div class="search-grid">
             <div>
-              <div class="search-label">名前 <span style="color:#c75050;">*</span></div>
-              <input id="search-name" class="search-input" type="text" placeholder="山田 太郎" autocomplete="off">
+              <div class="search-label">姓（カタカナ） <span style="color:#c75050;">*</span></div>
+              <input id="search-last-name-kana" class="search-input" type="text" inputmode="katakana" placeholder="ヤマダ" autocomplete="off">
+              <div class="hint">全角カタカナで入力してください。</div>
+            </div>
+            <div>
+              <div class="search-label">名（カタカナ） <span style="color:#c75050;">*</span></div>
+              <input id="search-first-name-kana" class="search-input" type="text" inputmode="katakana" placeholder="タロウ" autocomplete="off">
+              <div class="hint">全角カタカナで入力してください。</div>
             </div>
             <div>
               <div class="search-label">生年月日 <span style="color:#c75050;">*</span></div>
@@ -434,7 +440,7 @@
       </section>
 
       <div class="info-note">
-        <strong>ご注意：</strong>LINEに直接紐づく会員は自動で表示されます。別会員検索では、名前・生年月日・緊急連絡先またはメールアドレスの一致が必要です。
+        <strong>ご注意：</strong>LINEに直接紐づく会員は自動で表示されます。別会員検索では、姓カナ・名カナ・生年月日・緊急連絡先またはメールアドレスの一致が必要です。
       </div>
     </div>
   </main>
@@ -754,7 +760,8 @@
     async function searchMembers() {
       clearSearchErrors();
       const criteria = {
-        name: document.getElementById('search-name').value.trim(),
+        last_name_kana: toKatakana(document.getElementById('search-last-name-kana').value.trim()),
+        first_name_kana: toKatakana(document.getElementById('search-first-name-kana').value.trim()),
         birth_date: document.getElementById('search-birth-date').value,
         emergency_contact: document.getElementById('search-emergency').value.trim(),
         email: document.getElementById('search-email').value.trim()
@@ -817,7 +824,10 @@
 
     function validateSearchCriteria(criteria) {
       const errors = [];
-      if (!criteria.name) errors.push('名前を入力してください。');
+      if (!criteria.last_name_kana) errors.push('姓（カタカナ）を入力してください。');
+      if (!criteria.first_name_kana) errors.push('名（カタカナ）を入力してください。');
+      if (criteria.last_name_kana && !isKatakana(criteria.last_name_kana)) errors.push('姓は全角カタカナで入力してください。');
+      if (criteria.first_name_kana && !isKatakana(criteria.first_name_kana)) errors.push('名は全角カタカナで入力してください。');
       if (!criteria.birth_date) errors.push('生年月日を入力してください。');
       if (!criteria.emergency_contact && !criteria.email) {
         errors.push('緊急連絡先またはメールアドレスを入力してください。');
@@ -897,6 +907,27 @@
       return head + '***@' + domain;
     }
 
+    function toKatakana(value) {
+      return String(value || '')
+        .normalize('NFKC')
+        .replace(/[ぁ-ゖ]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60))
+        .replace(/[\s　]+/g, '');
+    }
+
+    function isKatakana(value) {
+      return /^[ァ-ヶー]+$/.test(String(value || ''));
+    }
+
+    function attachKanaNormalizer(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('input', () => {
+        const normalized = toKatakana(el.value);
+        if (el.value !== normalized) el.value = normalized;
+      });
+    }
+
+
     function escapeHtml(str) {
       const div = document.createElement('div');
       div.textContent = String(str == null ? '' : str);
@@ -907,7 +938,11 @@
       return escapeHtml(str).replace(/"/g, '&quot;');
     }
 
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => {
+      attachKanaNormalizer('search-last-name-kana');
+      attachKanaNormalizer('search-first-name-kana');
+      init();
+    });
   </script>
 </body>
 </html>
