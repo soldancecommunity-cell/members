@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SoL 会員情報</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sol-black: #1a1a1a;
+      --sol-white: #fafaf8;
+      --sol-gold: #c8a45a;
+      --sol-gold-light: #e8d5a0;
+      --sol-gray: #6b6b6b;
+      --sol-gray-light: #e0ddd8;
+      --sol-gray-bg: #f2f0eb;
+      --sol-red: #c75050;
+      --sol-green: #4a8c6f;
+      --radius: 12px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: var(--sol-gray-bg);
+      color: var(--sol-black);
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* --- Header --- */
+    .header {
+      background: var(--sol-black);
+      color: var(--sol-white);
+      padding: 20px 24px;
+      text-align: center;
+      position: relative;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--sol-gold), transparent);
+    }
+    .header-logo {
+      font-size: 13px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--sol-gold);
+      margin-bottom: 4px;
+    }
+    .header-title {
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    /* --- Loading / States --- */
+    .state-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60dvh;
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--sol-gray-light);
+      border-top-color: var(--sol-gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .state-msg {
+      font-size: 14px;
+      color: var(--sol-gray);
+      line-height: 1.6;
+    }
+
+    .error-icon {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: #fde8e8;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+      font-size: 24px;
+    }
+
+    .retry-btn {
+      margin-top: 20px;
+      padding: 10px 28px;
+      background: var(--sol-black);
+      color: var(--sol-white);
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* --- Member Card --- */
+    .member-section {
+      padding: 24px 20px 100px;
+      max-width: 480px;
+      margin: 0 auto;
+      animation: fadeUp 0.4s ease-out;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .member-card {
+      background: var(--sol-white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: var(--sol-black);
+      color: var(--sol-white);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .card-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--sol-gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700;
+      color: var(--sol-black);
+      flex-shrink: 0;
+    }
+    .card-name {
+      font-size: 17px;
+      font-weight: 500;
+    }
+    .card-id {
+      font-size: 11px;
+      color: var(--sol-gold-light);
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
+
+    /* --- Fields --- */
+    .fields {
+      padding: 8px 0;
+    }
+
+    .field-row {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--sol-gray-light);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.2s;
+    }
+    .field-row:last-child { border-bottom: none; }
+    .field-row.editing { background: #fdf9ef; }
+
+    .field-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--sol-gray-bg);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+    }
+    .field-row.editing .field-icon { background: #f5eedb; }
+
+    .field-body { flex: 1; min-width: 0; }
+    .field-label {
+      font-size: 11px;
+      color: var(--sol-gray);
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .field-value {
+      font-size: 15px;
+      font-weight: 500;
+      word-break: break-all;
+    }
+    .field-value.empty {
+      color: var(--sol-gray-light);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .field-input {
+      width: 100%;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--sol-black);
+      border: 1.5px solid var(--sol-gold);
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: var(--sol-white);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .field-input:focus {
+      border-color: var(--sol-black);
+      box-shadow: 0 0 0 3px rgba(200, 164, 90, 0.15);
+    }
+    .field-input.error {
+      border-color: var(--sol-red);
+    }
+    .field-error {
+      font-size: 11px;
+      color: var(--sol-red);
+      margin-top: 4px;
+    }
+
+    /* --- Buttons --- */
+    .action-bar {
+      padding: 16px 24px 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: var(--sol-black);
+      color: var(--sol-white);
+    }
+    .btn-primary:hover:not(:disabled) { background: #333; }
+
+    .btn-secondary {
+      background: var(--sol-gray-light);
+      color: var(--sol-black);
+    }
+    .btn-secondary:hover:not(:disabled) { background: #d4d1cc; }
+
+    .btn-save {
+      background: var(--sol-gold);
+      color: var(--sol-black);
+    }
+    .btn-save:hover:not(:disabled) { background: #b89545; }
+
+    .btn-cancel {
+      background: transparent;
+      color: var(--sol-gray);
+      border: 1.5px solid var(--sol-gray-light);
+    }
+
+    /* --- Toast --- */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--sol-black);
+      color: var(--sol-white);
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 100;
+      opacity: 0;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success { background: var(--sol-green); }
+    .toast.error { background: var(--sol-red); }
+
+    /* --- Note --- */
+    .info-note {
+      margin-top: 16px;
+      padding: 14px 18px;
+      background: var(--sol-white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      color: var(--sol-gray);
+      line-height: 1.7;
+    }
+    .info-note strong {
+      color: var(--sol-black);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-logo">SoL Dance Community</div>
+    <div class="header-title">会員情報</div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading" class="state-container">
+    <div class="spinner"></div>
+    <div class="state-msg">会員情報を読み込んでいます...</div>
+  </div>
+
+  <!-- Error -->
+  <div id="error" class="state-container" style="display:none;">
+    <div class="error-icon">⚠</div>
+    <div class="state-msg" id="error-msg">エラーが発生しました</div>
+    <button class="retry-btn" onclick="init()">再読み込み</button>
+  </div>
+
+  <!-- Member Info -->
+  <div id="member" class="member-section" style="display:none;">
+    <div class="member-card">
+      <div class="card-header">
+        <div class="card-avatar" id="avatar"></div>
+        <div>
+          <div class="card-name" id="display-name"></div>
+          <div class="card-id" id="display-id"></div>
+        </div>
+      </div>
+
+      <div class="fields" id="fields"></div>
+
+      <div class="action-bar" id="action-bar"></div>
+    </div>
+
+    <div class="info-note">
+      <strong>ご案内：</strong>登録内容は最新の状態に保ってください。変更内容は保存後に会員情報へ反映されます。
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <script>
+    // =============================================
+    // 設定 - デプロイ時に書き換え
+    // =============================================
+    const CONFIG = {
+      LIFF_ID: 'YOUR_LIFF_ID',          // ← LIFFアプリIDを設定
+      GAS_URL: 'YOUR_GAS_WEB_APP_URL'   // ← GASウェブアプリURLを設定
+    };
+
+    // =============================================
+    // State
+    // =============================================
+    let currentMember = null;
+    let isEditing = false;
+    let isSaving = false;
+
+    const FIELDS = [
+      { key: 'name', label: '名前', icon: '👤', type: 'text', placeholder: '山田 太郎' },
+      { key: 'emergency_contact', label: '緊急連絡先', icon: '📞', type: 'tel', placeholder: '09012345678' },
+      { key: 'email', label: 'メールアドレス', icon: '✉️', type: 'email', placeholder: 'example@mail.com' }
+    ];
+
+    // =============================================
+    // Init
+    // =============================================
+    async function init() {
+      showState('loading');
+
+      try {
+        // LIFF 初期化
+        await liff.init({ liffId: CONFIG.LIFF_ID });
+
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+
+        // アクセストークン取得
+        const accessToken = liff.getAccessToken();
+        if (!accessToken) throw new Error('LINEの認証情報を取得できませんでした');
+
+        // GAS から会員情報取得
+        const res = await fetchGAS('get', { accessToken });
+
+        if (!res.success) throw new Error(res.error || '会員情報の取得に失敗しました');
+
+        currentMember = res.member;
+        renderMember();
+        showState('member');
+
+      } catch (err) {
+        showError(err.message);
+      }
+    }
+
+    // =============================================
+    // API
+    // =============================================
+    async function fetchGAS(action, params = {}) {
+      const body = {
+        action,
+        accessToken: params.accessToken || liff.getAccessToken(),
+        ...params
+      };
+      delete body.accessToken;
+      body.accessToken = liff.getAccessToken();
+
+      const res = await fetch(CONFIG.GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, accessToken: liff.getAccessToken(), ...params })
+      });
+
+      if (!res.ok) throw new Error('サーバーとの通信に失敗しました');
+      return await res.json();
+    }
+
+    // =============================================
+    // Render
+    // =============================================
+    function renderMember() {
+      // Avatar & header
+      const name = currentMember.name || '---';
+      document.getElementById('avatar').textContent = name.charAt(0);
+      document.getElementById('display-name').textContent = name;
+      document.getElementById('display-id').textContent = 'ID: ' + (currentMember.member_id || '---');
+
+      // Fields
+      const fieldsEl = document.getElementById('fields');
+      fieldsEl.innerHTML = '';
+
+      FIELDS.forEach(f => {
+        const value = currentMember[f.key] || '';
+        const row = document.createElement('div');
+        row.className = 'field-row' + (isEditing ? ' editing' : '');
+        row.id = 'row-' + f.key;
+
+        row.innerHTML = `
+          <div class="field-icon">${f.icon}</div>
+          <div class="field-body">
+            <div class="field-label">${f.label}</div>
+            ${isEditing
+              ? `<input class="field-input" id="input-${f.key}" type="${f.type}"
+                   value="${escapeHtml(value)}" placeholder="${f.placeholder}"
+                   autocomplete="off">`
+              : `<div class="field-value ${!value ? 'empty' : ''}">${value || '未設定'}</div>`
+            }
+          </div>
+        `;
+        fieldsEl.appendChild(row);
+      });
+
+      // Buttons
+      const actionBar = document.getElementById('action-bar');
+      if (isEditing) {
+        actionBar.innerHTML = `
+          <button class="btn btn-cancel" onclick="cancelEdit()">キャンセル</button>
+          <button class="btn btn-save" id="save-btn" onclick="saveChanges()">保存する</button>
+        `;
+      } else {
+        actionBar.innerHTML = `
+          <button class="btn btn-primary" onclick="startEdit()">編集する</button>
+        `;
+      }
+    }
+
+    // =============================================
+    // Edit
+    // =============================================
+    function startEdit() {
+      isEditing = true;
+      renderMember();
+      // 最初のフィールドにフォーカス
+      const firstInput = document.getElementById('input-name');
+      if (firstInput) setTimeout(() => firstInput.focus(), 100);
+    }
+
+    function cancelEdit() {
+      isEditing = false;
+      // エラー表示をクリア
+      document.querySelectorAll('.field-error').forEach(el => el.remove());
+      renderMember();
+    }
+
+    async function saveChanges() {
+      if (isSaving) return;
+
+      // 入力値取得
+      const updates = {};
+      let hasChanges = false;
+
+      FIELDS.forEach(f => {
+        const input = document.getElementById('input-' + f.key);
+        if (!input) return;
+        const newVal = input.value.trim();
+        const oldVal = (currentMember[f.key] || '').trim();
+        if (newVal !== oldVal) {
+          updates[f.key] = newVal;
+          hasChanges = true;
+        }
+      });
+
+      if (!hasChanges) {
+        showToast('変更はありません', 'info');
+        cancelEdit();
+        return;
+      }
+
+      // フロントエンドバリデーション
+      clearErrors();
+      const errors = validateFrontend(updates);
+      if (errors.length > 0) {
+        errors.forEach(e => showFieldError(e.field, e.message));
+        return;
+      }
+
+      // 保存
+      isSaving = true;
+      const saveBtn = document.getElementById('save-btn');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = '保存中...';
+      }
+
+      try {
+        const res = await fetchGAS('update', { updates });
+
+        if (!res.success) {
+          showToast(res.error || '保存に失敗しました', 'error');
+          return;
+        }
+
+        currentMember = res.member;
+        isEditing = false;
+        renderMember();
+        showToast('会員情報を更新しました', 'success');
+
+      } catch (err) {
+        showToast('通信エラーが発生しました', 'error');
+      } finally {
+        isSaving = false;
+      }
+    }
+
+    // =============================================
+    // Validation
+    // =============================================
+    function validateFrontend(updates) {
+      const errors = [];
+
+      if (updates.name !== undefined) {
+        if (updates.name.length === 0) errors.push({ field: 'name', message: '名前を入力してください' });
+        if (updates.name.length > 50) errors.push({ field: 'name', message: '50文字以内で入力してください' });
+      }
+
+      if (updates.emergency_contact !== undefined) {
+        const emergencyContact = updates.emergency_contact.replace(/[-\s]/g, '');
+        if (!/^0\d{9,10}$/.test(emergencyContact)) {
+          errors.push({ field: 'emergency_contact', message: '正しい緊急連絡先を入力してください（例: 09012345678）' });
+        }
+      }
+
+      if (updates.email !== undefined && updates.email.length > 0) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updates.email)) {
+          errors.push({ field: 'email', message: '正しいメールアドレスを入力してください' });
+        }
+      }
+
+      return errors;
+    }
+
+    function showFieldError(fieldKey, message) {
+      const input = document.getElementById('input-' + fieldKey);
+      if (!input) return;
+      input.classList.add('error');
+      const errEl = document.createElement('div');
+      errEl.className = 'field-error';
+      errEl.textContent = message;
+      input.parentNode.appendChild(errEl);
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.field-input.error').forEach(el => el.classList.remove('error'));
+      document.querySelectorAll('.field-error').forEach(el => el.remove());
+    }
+
+    // =============================================
+    // UI Helpers
+    // =============================================
+    function showState(state) {
+      document.getElementById('loading').style.display = state === 'loading' ? '' : 'none';
+      document.getElementById('error').style.display = state === 'error' ? '' : 'none';
+      document.getElementById('member').style.display = state === 'member' ? '' : 'none';
+    }
+
+    function showError(msg) {
+      document.getElementById('error-msg').textContent = msg;
+      showState('error');
+    }
+
+    let toastTimer;
+    function showToast(msg, type = 'info') {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'toast ' + type + ' show';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.classList.remove('show'); }, 2500);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // =============================================
+    // Start
+    // =============================================
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
