@@ -352,6 +352,136 @@
     .toast.error { background: var(--sol-red); }
 
     [hidden] { display: none !important; }
+
+    /* ===== 生年月日 ホイールピッカー ===== */
+    .date-trigger {
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--sol-black);
+      background: var(--sol-white);
+      border: 1.5px solid var(--sol-gold);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .date-trigger:focus { outline: none; border-color: var(--sol-black); box-shadow: 0 0 0 3px rgba(200,164,90,0.15); }
+    .date-trigger.placeholder { color: #a9a39a; font-weight: 400; }
+    .date-trigger .chevron { color: var(--sol-gold); font-size: 12px; flex-shrink: 0; }
+
+    .date-picker-overlay {
+      position: fixed; inset: 0;
+      background: rgba(26,26,26,0.55);
+      display: flex; align-items: flex-end; justify-content: center;
+      z-index: 200;
+      animation: dpFade 0.2s ease-out;
+    }
+    @keyframes dpFade { from { opacity: 0; } to { opacity: 1; } }
+
+    .date-picker-sheet {
+      width: 100%;
+      max-width: 520px;
+      background: var(--sol-white);
+      border-radius: 16px 16px 0 0;
+      padding-bottom: env(safe-area-inset-bottom);
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+      animation: dpSlide 0.25s ease-out;
+    }
+    @keyframes dpSlide { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+    .date-picker-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--sol-gray-light);
+    }
+    .date-picker-title {
+      font-size: 14px; font-weight: 700;
+      color: var(--sol-black);
+    }
+    .date-picker-cancel,
+    .date-picker-done {
+      background: none; border: none;
+      font-family: inherit; font-size: 14px;
+      cursor: pointer; padding: 6px 10px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .date-picker-cancel { color: var(--sol-gray); }
+    .date-picker-done { color: var(--sol-gold); font-weight: 700; }
+    .date-picker-done:active,
+    .date-picker-cancel:active { opacity: 0.5; }
+
+    .date-picker-wheels {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      height: 200px;
+      padding: 0 16px;
+      background: var(--sol-white);
+    }
+    /* 中央の選択バンド */
+    .date-picker-wheels::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 12px; right: 12px;
+      height: 40px;
+      transform: translateY(-50%);
+      background: var(--sol-gray-bg);
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* 上下フェードマスク */
+    .date-picker-wheels::after {
+      content: '';
+      position: absolute; inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      background:
+        linear-gradient(to bottom, var(--sol-white) 0%, rgba(255,255,255,0) 35%, rgba(255,255,255,0) 65%, var(--sol-white) 100%);
+    }
+
+    .wheel {
+      position: relative;
+      z-index: 1;
+      height: 200px;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      text-align: center;
+      touch-action: pan-y;
+      overscroll-behavior: contain;
+    }
+    .wheel::-webkit-scrollbar { display: none; }
+    .wheel ul {
+      list-style: none;
+      padding: 80px 0; /* (200 - 40) / 2 で先頭・末尾も中央に来る */
+      margin: 0;
+    }
+    .wheel li {
+      height: 40px;
+      line-height: 40px;
+      scroll-snap-align: center;
+      font-size: 16px;
+      color: #b6b1a8;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.15s, font-size 0.15s, font-weight 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wheel li.active {
+      color: var(--sol-black);
+      font-weight: 700;
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -418,7 +548,11 @@
             </div>
             <div>
               <div class="search-label">生年月日 <span style="color:#c75050;">*</span></div>
-              <input id="search-birth-date" class="search-input" type="date" autocomplete="bday">
+              <button type="button" id="birth-date-trigger" class="date-trigger placeholder" aria-haspopup="dialog">
+                <span id="birth-date-display">選択してください</span>
+                <span class="chevron">▼</span>
+              </button>
+              <input id="search-birth-date" type="hidden" autocomplete="bday">
             </div>
             <div>
               <div class="search-label">緊急連絡先</div>
@@ -446,6 +580,22 @@
   </main>
 
   <div id="toast" class="toast"></div>
+
+  <!-- 生年月日 ホイールピッカー -->
+  <div id="date-picker-modal" class="date-picker-overlay" hidden role="dialog" aria-modal="true" aria-label="生年月日を選択">
+    <div class="date-picker-sheet" role="document">
+      <div class="date-picker-header">
+        <button type="button" class="date-picker-cancel" id="date-picker-cancel">キャンセル</button>
+        <div class="date-picker-title">生年月日</div>
+        <button type="button" class="date-picker-done" id="date-picker-done">完了</button>
+      </div>
+      <div class="date-picker-wheels">
+        <div class="wheel" data-type="year"  aria-label="年"><ul></ul></div>
+        <div class="wheel" data-type="month" aria-label="月"><ul></ul></div>
+        <div class="wheel" data-type="day"   aria-label="日"><ul></ul></div>
+      </div>
+    </div>
+  </div>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
@@ -977,9 +1127,198 @@
       return escapeHtml(str).replace(/"/g, '&quot;');
     }
 
+    // ============================================================
+    // 生年月日 ホイールピッカー
+    // ・隠し input#search-birth-date には YYYY-MM-DD 形式で値を入れる
+    //   （既存の検索処理側コードはそのまま使える）
+    // ・iOS Safari の scroll-snap タイミング問題に対応
+    // ・月選択に応じて日数を再生成（うるう年も考慮）
+    // ============================================================
+    const BirthDatePicker = (() => {
+      const ITEM_H = 40;            // .wheel li の height と一致させる
+      const MIN_YEAR = 1930;
+      const MAX_YEAR = new Date().getFullYear();
+      const DEFAULT_YEAR = 1995;
+
+      let trigger, display, hidden, modal;
+      let wheels = {};
+      let pending = { year: DEFAULT_YEAR, month: 1, day: 1 };
+      const scrollTimers = {};
+
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function daysInMonth(y, m) {
+        // m: 1-12 → Date(y, m, 0) は前月扱いなので翌月の0日 = 当月末日
+        return new Date(y, m, 0).getDate();
+      }
+
+      function clampDay() {
+        const max = daysInMonth(pending.year, pending.month);
+        if (pending.day > max) pending.day = max;
+      }
+
+      // 現在の中央位置からアクティブ要素にクラス付与
+      function markActive(wheel) {
+        const ul = wheel.firstElementChild;
+        if (!ul) return;
+        const idx = Math.round(wheel.scrollTop / ITEM_H);
+        const items = ul.children;
+        for (let i = 0; i < items.length; i++) {
+          if (i === idx) items[i].classList.add('active');
+          else items[i].classList.remove('active');
+        }
+      }
+
+      // scroll-snap が ON の状態で scrollTop を強制設定すると iOS が無視するため、
+      // 一度 snap を切ってから戻す
+      function setScroll(wheel, idx) {
+        wheel.style.scrollSnapType = 'none';
+        wheel.scrollTop = idx * ITEM_H;
+        // 2フレーム後に snap を戻す（1フレームだと iOS で不安定）
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            wheel.style.scrollSnapType = '';
+            markActive(wheel);
+          });
+        });
+      }
+
+      function buildWheel(wheel, items, selectedIdx) {
+        const ul = wheel.firstElementChild;
+        ul.innerHTML = items.map(label => '<li>' + label + '</li>').join('');
+        setScroll(wheel, Math.max(0, Math.min(selectedIdx, items.length - 1)));
+      }
+
+      function rebuildDays() {
+        clampDay();
+        const max = daysInMonth(pending.year, pending.month);
+        const days = [];
+        for (let d = 1; d <= max; d++) days.push(d + '日');
+        buildWheel(wheels.day, days, pending.day - 1);
+      }
+
+      function buildAll() {
+        const years = [];
+        for (let y = MIN_YEAR; y <= MAX_YEAR; y++) years.push(y + '年');
+        buildWheel(wheels.year, years, pending.year - MIN_YEAR);
+
+        const months = [];
+        for (let m = 1; m <= 12; m++) months.push(m + '月');
+        buildWheel(wheels.month, months, pending.month - 1);
+
+        rebuildDays();
+      }
+
+      function attachWheel(wheel, type) {
+        // スクロール中はリアルタイムで active を更新
+        wheel.addEventListener('scroll', () => {
+          markActive(wheel);
+          clearTimeout(scrollTimers[type]);
+          // 慣性スクロールが落ち着いてから state 更新
+          scrollTimers[type] = setTimeout(() => {
+            const idx = Math.round(wheel.scrollTop / ITEM_H);
+            if (type === 'year') {
+              const newYear = MIN_YEAR + idx;
+              if (newYear !== pending.year) {
+                pending.year = newYear;
+                rebuildDays(); // うるう年で2/29が消える等のケア
+              }
+            } else if (type === 'month') {
+              const newMonth = idx + 1;
+              if (newMonth !== pending.month) {
+                pending.month = newMonth;
+                rebuildDays();
+              }
+            } else if (type === 'day') {
+              pending.day = idx + 1;
+            }
+          }, 120);
+        }, { passive: true });
+
+        // 中心以外の項目をタップで中心にスナップ
+        wheel.addEventListener('click', e => {
+          const li = e.target.closest('li');
+          if (!li) return;
+          const ul = wheel.firstElementChild;
+          const idx = Array.prototype.indexOf.call(ul.children, li);
+          if (idx >= 0) {
+            wheel.scrollTo({ top: idx * ITEM_H, behavior: 'smooth' });
+          }
+        });
+      }
+
+      function open() {
+        // 既存値があれば反映、なければデフォルト
+        const v = hidden.value;
+        if (v && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
+          const [y, m, d] = v.split('-').map(Number);
+          pending = {
+            year: Math.min(MAX_YEAR, Math.max(MIN_YEAR, y)),
+            month: Math.min(12, Math.max(1, m)),
+            day: Math.min(31, Math.max(1, d))
+          };
+        } else {
+          pending = { year: DEFAULT_YEAR, month: 1, day: 1 };
+        }
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        // モーダルが表示されてから wheel をビルド（display:none → block 直後に scrollTop は不安定）
+        requestAnimationFrame(() => buildAll());
+      }
+
+      function close() {
+        modal.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function done() {
+        clampDay();
+        const v = pending.year + '-' + pad(pending.month) + '-' + pad(pending.day);
+        hidden.value = v;
+        display.textContent = pending.year + '年' + pending.month + '月' + pending.day + '日';
+        trigger.classList.remove('placeholder');
+        // 既存のエラー表示をクリア
+        trigger.classList.remove('error');
+        close();
+      }
+
+      function init() {
+        trigger = document.getElementById('birth-date-trigger');
+        display = document.getElementById('birth-date-display');
+        hidden  = document.getElementById('search-birth-date');
+        modal   = document.getElementById('date-picker-modal');
+        if (!trigger || !modal) return;
+
+        wheels = {
+          year:  modal.querySelector('.wheel[data-type="year"]'),
+          month: modal.querySelector('.wheel[data-type="month"]'),
+          day:   modal.querySelector('.wheel[data-type="day"]')
+        };
+
+        trigger.addEventListener('click', open);
+        document.getElementById('date-picker-cancel').addEventListener('click', close);
+        document.getElementById('date-picker-done').addEventListener('click', done);
+        // オーバーレイ部分タップで閉じる
+        modal.addEventListener('click', e => {
+          if (e.target === modal) close();
+        });
+        // ESC で閉じる（PC用）
+        document.addEventListener('keydown', e => {
+          if (e.key === 'Escape' && !modal.hidden) close();
+        });
+
+        attachWheel(wheels.year, 'year');
+        attachWheel(wheels.month, 'month');
+        attachWheel(wheels.day, 'day');
+      }
+
+      return { init };
+    })();
+
     document.addEventListener('DOMContentLoaded', () => {
       attachKanaNormalizer('search-last-name-kana');
       attachKanaNormalizer('search-first-name-kana');
+      BirthDatePicker.init();
       init();
     });
   </script>
