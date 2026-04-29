@@ -921,9 +921,48 @@
     function attachKanaNormalizer(id) {
       const el = document.getElementById(id);
       if (!el) return;
-      el.addEventListener('input', () => {
+
+      // IME（日本語入力）変換中は value を触らない。
+      // 変換中に value を書き換えると composition が中断され、
+      // スマホで「1文字打つと予測変換が大量に流し込まれる」「キー入力が効かなくなる」
+      // といった現象が発生する。
+      let composing = false;
+
+      const normalizeNow = () => {
         const normalized = toKatakana(el.value);
-        if (el.value !== normalized) el.value = normalized;
+        if (el.value !== normalized) {
+          // カーソル位置を可能な範囲で維持
+          const pos = el.selectionStart;
+          el.value = normalized;
+          try {
+            if (pos != null) {
+              const newPos = Math.min(pos, normalized.length);
+              el.setSelectionRange(newPos, newPos);
+            }
+          } catch (_) { /* type=email など setSelectionRange 不可な型は無視 */ }
+        }
+      };
+
+      el.addEventListener('compositionstart', () => {
+        composing = true;
+      });
+
+      el.addEventListener('compositionend', () => {
+        composing = false;
+        // 確定後に正規化
+        normalizeNow();
+      });
+
+      el.addEventListener('input', (e) => {
+        // 変換中（IME composition 中）は何もしない
+        if (composing || e.isComposing) return;
+        normalizeNow();
+      });
+
+      // フォーカス離脱時にも保険で正規化（ペースト経路などのフォロー）
+      el.addEventListener('blur', () => {
+        if (composing) return;
+        normalizeNow();
       });
     }
 
